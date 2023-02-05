@@ -8,7 +8,9 @@
 #include <stdlib.h>
 
 page_directory_t *pd;
+
 extern uint32_t KERNEL_END;
+extern uint32_t KERNEL_START;
 
 void ptm_initialize() {
     // Round up to nearest page boundary in order to keep everything 4kib aligned
@@ -48,6 +50,11 @@ void ptm_initialize() {
         ptm_map_addr(addr, addr, true, true);
     }
     
+    //Lock kernel pages after we finish doing everything (from now on we should only use mapped memory)
+	uint32_t kernel_size = KERNEL_END - KERNEL_START;
+	uint32_t kernel_pages = NUM_PAGES(kernel_size);
+	pfa_lock_pages((void *)KERNEL_START, kernel_pages);
+
     ptm_load(pd);
 }
 
@@ -58,7 +65,7 @@ void ptm_map_addr(uint32_t addr, uint32_t phys_addr, bool is_kernel, bool is_wri
     // Doesn't allow for re-mapping the address, so should be fixed later (maybe with overwrite flag?)
     if (!pde) {
         // Shouldn't happen because we already made all of the page directories
-        printf("OOPSIES, %d", pde_index);
+        printf("OOPSIES, %d", pde_index); // TODO: Panic
         abort();
         
         // // No page directory entry

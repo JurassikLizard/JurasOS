@@ -10,6 +10,9 @@ extern "C" {
 __attribute__((__noreturn__))
 void abort(void);
 
+__attribute__((__noreturn__))
+void PANIC(const char *message, ...);
+
 #ifdef __cplusplus
 }
 #endif

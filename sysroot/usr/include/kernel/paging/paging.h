@@ -37,8 +37,10 @@ typedef struct page_directory_struct
 **/
 void ptm_initialize();
 
+// Maps addr to phys addr and gives 2 flags
 void ptm_map_addr(uint32_t addr, uint32_t phys_addr, bool is_kernel, bool is_writable);
 
+// Loads page_directory into CR3 register
 void ptm_load(page_directory_t *dir);
 
 #ifdef __cplusplus

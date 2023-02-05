@@ -19,19 +19,34 @@ typedef struct page_frame_allocator_struct {
 
 void pfa_read_multiboot_memory_map(multiboot_info_t* mbt);
 
+// Free 4096 chunk of memory at address
 void pfa_free_page(void *address);
-void pfa_lock_pages(void *address, uint32_t page_count);
-void pfa_free_page(void *address);
+// Lock 4096 chunk of memory at address
+void pfa_lock_page(void *address);
+
+// Free 4096 * page_count chunk of memory at address
+void pfa_free_pages(void *address, uint32_t page_count);
+// Lock 4096 * page_count chunk of memory at address
 void pfa_lock_pages(void *address, uint32_t page_count);
 
+// Find page
+__attribute__((assume_aligned(4096)))
 void *pfa_request_page();
+// Find contiguous page_count pages
+__attribute__((assume_aligned(4096)))
 void *pfa_request_pages(uint32_t page_count);
-// Create page and identity map it
+// Find page and identity map it
+__attribute__((assume_aligned(4096)))
 void *pfa_request_mpage();
+// Find contiguous page_count pages and identity map them
+__attribute__((assume_aligned(4096)))
 void *pfa_request_mpages(uint32_t page_count);
 
+// Get free memory available
 uint32_t pfa_free_memory();
+// Get reserved memory (reserved by system)
 uint32_t pfa_reserved_memory();
+// Get locked memory used by kernel
 uint32_t pfa_used_memory();
 
 #ifdef __cplusplus

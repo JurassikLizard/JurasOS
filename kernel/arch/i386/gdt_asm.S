@@ -19,7 +19,7 @@ load_gdt:
 
 # Reload CS register containing code selector:
 reloadSegments: 
-jmp   $0x08,$reload_CS # 0x08 is a stand-in for your code segment
+jmp   $0x08,$reload_CS # 0x08 is our code segment
 
 reload_CS:
 movw    $0x10,%ax # 0x10 is a stand-in for your data segment

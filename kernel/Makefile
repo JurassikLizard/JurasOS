@@ -36,10 +36,8 @@ LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
 
 KERNEL_OBJS=\
 kernel/kernel.o \
-kernel/mmap.o \
 kernel/bitmap.o \
 $(KERNEL_ARCH_OBJS)
-
 
 OBJS=\
 $(ARCHDIR)/crti.o \
@@ -79,6 +77,7 @@ $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 
 clean:
 	rm -f jurasos.kernel
+	rm -f $(ARCHDIR)/interrupts/interrupts.gro
 	rm -f $(OBJS) *.o */*.o */*/*.o
 	rm -f $(OBJS:.o=.d) *.d */*.d */*/*.d
 

@@ -81,28 +81,7 @@ void init_bitmap(size_t bitmap_size, void *buffer_address) {
     }
 }
 
-void pfa_free_page(void *address) {
-    uint32_t index = (uint32_t) address / 4096;
-    
-    if (bitmap_get(&pfa.page_bitmap, index) == false) return; // Already free
-    
-    // Set and update memory counts
-    bitmap_set(&pfa.page_bitmap, index, false);
-    free_memory += 4096;
-    used_memory -= 4096;
-}
-
-void pfa_lock_page(void *address) {
-    uint32_t index = (uint32_t) address / 4096;
-    
-    if (bitmap_get(&pfa.page_bitmap, index) == true) return; // Already free
-    
-    // Set and update memory counts
-    bitmap_set(&pfa.page_bitmap, index, true);
-    free_memory -= 4096;
-    used_memory += 4096;
-}
-
+__attribute__((assume_aligned(4096)))
 void *pfa_request_page() {
     for (uint32_t index = 0; index < pfa.page_bitmap.size * 8; index++) {
         if (bitmap_get(&pfa.page_bitmap, index) == true) continue;
@@ -116,6 +95,7 @@ void *pfa_request_page() {
 }
 
 // Very bad implementation and should be redone allow for non-sequential blocks of memory to be allocated
+__attribute__((assume_aligned(4096)))
 void *pfa_request_pages(uint32_t page_count) {
     for (uint32_t index = 0; index < pfa.page_bitmap.size * 8; index++) {
         uint8_t broken_memory_flag = 0;
@@ -137,6 +117,7 @@ void *pfa_request_pages(uint32_t page_count) {
     return NULL;
 }
 
+__attribute__((assume_aligned(4096)))
 void *pfa_request_mpage() {
     for (uint32_t index = 0; index < pfa.page_bitmap.size * 8; index++) {
         if (bitmap_get(&pfa.page_bitmap, index) == true) continue;
@@ -151,6 +132,7 @@ void *pfa_request_mpage() {
     return NULL;
 }
 
+__attribute__((assume_aligned(4096)))
 void *pfa_request_mpages(uint32_t page_count) {
     for (uint32_t index = 0; index < pfa.page_bitmap.size * 8; index++) {
         uint8_t broken_memory_flag = 0;
@@ -178,6 +160,40 @@ void *pfa_request_mpages(uint32_t page_count) {
     return NULL;
 }
 
+void pfa_free_page(void *address) {
+    uint32_t index = (uint32_t) address / 4096;
+    
+    if (bitmap_get(&pfa.page_bitmap, index) == false) return; // Already free
+    
+    // Set and update memory counts
+    bitmap_set(&pfa.page_bitmap, index, false);
+    free_memory += 4096;
+    used_memory -= 4096;
+}
+
+void pfa_lock_page(void *address) {
+    uint32_t index = (uint32_t) address / 4096;
+    
+    if (bitmap_get(&pfa.page_bitmap, index) == true) return; // Already free
+    
+    // Set and update memory counts
+    bitmap_set(&pfa.page_bitmap, index, true);
+    free_memory -= 4096;
+    used_memory += 4096;
+}
+
+void pfa_free_pages(void *address, uint32_t page_count) {
+    for (uint32_t i = 0; i < page_count; i++) {
+        pfa_free_page((void *)( (uint32_t)address + (i * 4096) ));
+    }
+}
+
+void pfa_lock_pages(void *address, uint32_t page_count) {
+    for (uint32_t i = 0; i < page_count; i++) {
+        pfa_lock_page((void *)( (uint32_t)address + (i * 4096) ));
+    }
+}
+
 void pfa_unreserve_page(void *address) {
     uint32_t index = (uint32_t) address / 4096;
     
@@ -196,18 +212,6 @@ void pfa_reserve_page(void *address) {
     // Set and update memory counts
     bitmap_set(&pfa.page_bitmap, index, true);
     reserved_memory += 4096;
-}
-
-void pfa_free_pages(void *address, uint32_t page_count) {
-    for (uint32_t i = 0; i < page_count; i++) {
-        pfa_free_page((void *)( (uint32_t)address + (i * 4096) ));
-    }
-}
-
-void pfa_lock_pages(void *address, uint32_t page_count) {
-    for (uint32_t i = 0; i < page_count; i++) {
-        pfa_lock_page((void *)( (uint32_t)address + (i * 4096) ));
-    }
 }
 
 void pfa_unreserve_pages(void *address, uint32_t page_count) {

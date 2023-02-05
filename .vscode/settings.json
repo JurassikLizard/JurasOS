@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "*.ejs": "html",
+        "*.ld": "json",
+        "*.config": "makefile",
+        "idt.h": "c",
+        "pfa.h": "c",
+        "interrupts.h": "c",
+        "stdio.h": "c",
+        "io.h": "c",
+        "paging.h": "c",
+        "stdint.h": "c",
+        "stdlib.h": "c"
+    }
+}

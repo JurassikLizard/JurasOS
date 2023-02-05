@@ -33,6 +33,7 @@ FREEOBJS=\
 $(ARCH_FREEOBJS) \
 stdio/stdio.o \
 stdlib/abort.o \
+stdlib/panic.o \
 string/memcmp.o \
 string/memcpy.o \
 string/memmove.o \

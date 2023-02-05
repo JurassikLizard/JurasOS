@@ -25,8 +25,6 @@ struct gdt {
     struct gdt_entry user_data_segment;
 } __attribute__((packed)) __attribute__((aligned(0x1000)));
 
-extern struct gdt default_gdt;
-
 extern void load_gdt(uint32_t limit, uint32_t base);
 
 #ifdef __cplusplus
