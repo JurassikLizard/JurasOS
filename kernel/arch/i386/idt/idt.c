@@ -34,6 +34,6 @@ void idt_install()
     irq_install();
 
     __asm__ volatile("lidt %0" : : "m"(idtp));
-    io_outb(0x21, 0xfd);
+    io_outb(0x21, 0xfc);
     io_outb(0xa1, 0xff);
 }

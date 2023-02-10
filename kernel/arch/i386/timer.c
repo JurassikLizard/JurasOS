@@ -5,8 +5,6 @@
 #include <kernel/io.h>
 #include <stdlib.h>
 
-#include <stdio.h>
-
 uint32_t tick;
 
 static void timer_callback(registers_t regs)
@@ -34,7 +32,4 @@ void init_timer(uint32_t frequency)
    // Send the frequency divisor.
    io_outb(0x40, l);
    io_outb(0x40, h);
-
-   io_outb(0x21,0xfe);
-   io_outb(0xa1,0xff);
 }

@@ -9,6 +9,7 @@
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
 #include <kernel/timer.h>
+#include <kernel/keyboard.h>
 #include <kernel/paging/pfa.h>
 #include <kernel/paging/paging.h>
 
@@ -34,21 +35,20 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic) {
     }
 	
 	pfa_read_multiboot_memory_map(mbt);
-	
-	ptm_initialize();
+
+	init_timer(50);
+	init_keyboard();
 
 	asm volatile("sti");
   	idt_install();
+	
+	ptm_initialize();
 
 	printf("After init KERNEL_END: 0x%X\n", KERNEL_END);
 
 	printf("Total Memory: %d, Free: %d, Reserved: %d, Used: %d\n", 
 		pfa_free_memory() + pfa_reserved_memory() + pfa_used_memory(),
 		pfa_free_memory(), pfa_reserved_memory(), pfa_used_memory());
-
-	
-	
-	init_timer(50);
 
 	printf("\nHello, kernel world!\n");
 

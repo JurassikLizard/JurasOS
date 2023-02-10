@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-#define NUM_PAGES(x) ((uint32_t)x / 4097 + 1)
+#define NUM_PAGES(x) ((uint32_t)x / 4098 + 1)
 
 typedef struct page_frame_allocator_struct {
     bitmap_t page_bitmap;

@@ -68,6 +68,16 @@ void terminal_putchar(char c) {
 	else if (uc == '\t') {
 		terminal_column += 4 - (terminal_row % 4);
 	}
+	else if (uc == '\b') {
+		if(terminal_column == 0) {
+			terminal_column = VGA_WIDTH - 1;
+			terminal_row--;
+		}
+		else {
+			terminal_column--;
+		}
+		terminal_putentryat('\0', terminal_color, terminal_column, terminal_row);
+	}
 	else{
 		terminal_putentryat(uc, terminal_color, terminal_column, terminal_row);
 		terminal_column += 1;
