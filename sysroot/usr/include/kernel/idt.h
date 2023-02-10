@@ -24,11 +24,17 @@ struct idt_ptr
   uint32_t base;
 } __attribute__((packed));
 
+typedef struct registers
+{
+  uint32_t ds;                  // Data segment selector
+  uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; // Pushed by pusha.
+  uint32_t int_no, err_code;    // Interrupt number and error code (if applicable)
+  uint32_t eip, cs, eflags, useresp, ss; // Pushed by the processor automatically.
+} registers_t;
+
 void idt_install();
 
-void division_error_handler(void);
-void double_fault_handler(void);
-void page_fault_handler(void);
+void idt_set_gate(uint8_t num, uint32_t base, uint16_t selector, uint8_t flags);
 
 #ifdef __cplusplus
 }

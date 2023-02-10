@@ -2,30 +2,34 @@
 #define _GDT_H 1
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct gdt_entry {
-    uint16_t limit0;
-    uint16_t base0;
-    uint8_t base1;
-    uint8_t access_byte;
-    uint8_t limit1_flags;
-    uint8_t base2;
+/* Defines a GDT entry. We say packed, because it prevents the
+*  compiler from doing things that it thinks is best: Prevent
+*  compiler "optimization" by packing */
+struct gdt_entry
+{
+    uint16_t limit_low;
+    uint16_t base_low;
+    uint8_t base_middle;
+    uint8_t access;
+    uint8_t granularity;
+    uint8_t base_high;
 } __attribute__((packed));
 
+/* Special pointer which includes the limit: The max bytes
+*  taken up by the GDT, minus 1. Again, this NEEDS to be packed */
+struct gdt_ptr
+{
+    uint16_t limit;
+    uint32_t base;
+} __attribute__((packed));
 
-struct gdt {
-    struct gdt_entry null;
-    struct gdt_entry kernel_code_segment;
-    struct gdt_entry kernel_data_segment;
-    struct gdt_entry user_code_segment;
-    struct gdt_entry user_data_segment;
-} __attribute__((packed)) __attribute__((aligned(0x1000)));
-
-extern void load_gdt(uint32_t limit, uint32_t base);
+void gdt_install();
 
 #ifdef __cplusplus
 }

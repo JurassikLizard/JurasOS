@@ -1,21 +1,23 @@
-gdtr:
-dw 0 ; For limit storage
-dd 0 ; For base storage
+pusha                    ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
 
-mov   AX, gdtr
-mov   [ebx], AX
-mov   EAX, [ESP + 8]
-mov   [ebx + 2], EAX
-ret
+mov ax, ds               ; Lower 16-bits of eax = ds.
+push eax                 ; save the data segment descriptor
 
-reloadSegments:
-JMP   0x08:.reload_CS ; 0x08 is a stand-in for your code segment
-.reload_CS:
-MOV   AX, 0x10 ; 0x10 is a stand-in for your data segment
-MOV   DS, AX
-MOV   ES, AX
-MOV   FS, AX
-MOV   GS, AX
-MOV   SS, AX
-RET
+mov ax, 0x10  ; load the kernel data segment descriptor
+mov ds, ax
+mov es, ax
+mov fs, ax
+mov gs, ax
 
+call irq_handler
+
+pop ebx        ; reload the original data segment descriptor
+mov ds, bx
+mov es, bx
+mov fs, bx
+mov gs, bx
+
+popa                     ; Pops edi,esi,ebp...
+add esp, 8     ; Cleans up the pushed error code and pushed ISR number
+sti
+iret           ; pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP

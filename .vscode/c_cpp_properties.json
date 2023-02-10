@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/sysroot/usr/include",
-                "/sysroot/usr/include"
+                "/sysroot/usr/include",
+                "${workspaceRoot}"
             ],
             "defines": [
                 "VGA_COLOR_BLACK = 0x00",

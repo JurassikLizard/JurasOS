@@ -1,22 +1,23 @@
-gdtr: 
-.word 0 # For limit storage
-.long 0 # For base storage
+pusha                    # Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
 
-movw  $gdtr, %ax
-movw  %ax,(%ebx)
-movl  8(%esp),%eax
-movl  %eax,2(%ebx)
-ret
+movw %ds,%ax             # Lower 16-bits of eax = ds.
+pushl %eax               # save the data segment descriptor
 
-reloadSegments: 
-jMP   0x08:.reload_CS # 0x08 is a stand-in for your code segment
-reloadSegments.reload_CS: 
-movw  $0x10,%ax # 0x10 is a stand-in for your data segment
-movw  %ax,%ds
-movw  %ax,%es
-movw  %ax,%fs
-movw  %ax,%gs
-movw  %ax,%ss
-ret
+movw $0x10,%ax # load the kernel data segment descriptor
+movw %ax,%ds
+movw %ax,%es
+movw %ax,%fs
+movw %ax,%gs
 
+call irq_handler
 
+popl %ebx      # reload the original data segment descriptor
+movw %bx,%ds
+movw %bx,%es
+movw %bx,%fs
+movw %bx,%gs
+
+popa                     # Pops edi,esi,ebp...
+addl $8,%esp   # Cleans up the pushed error code and pushed ISR number
+sti
+iret           # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP

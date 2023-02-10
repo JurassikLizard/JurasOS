@@ -1,6 +1,13 @@
 #include <kernel/idt.h>
 
+#include "isr.h"
+#include "irq.h"
+
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+
+#include <kernel/io.h>
 
 struct idt_entry idt[256];
 struct idt_ptr idtp;
@@ -13,14 +20,20 @@ void idt_set_gate(uint8_t num, uint32_t base, uint16_t selector, uint8_t flags)
     idt[num].zero = 0;
     idt[num].type_attr = flags;
 }
-        
+
 void idt_install()
 {
-    idt_set_gate(0, (uint32_t)division_error_handler, 0x08, 0x8E);
-    idt_set_gate(8, (uint32_t)double_fault_handler, 0x08, 0x8E);
-    idt_set_gate(14, (uint32_t)page_fault_handler, 0x08, 0x8E);
+    /* Sets the special IDT pointer up, just like in 'gdt.c' */
+    idtp.limit = (sizeof (struct idt_entry) * 256) - 1;
+    idtp.base = (uint32_t) &idt;
+
+    /* Clear out the entire IDT, initializing it to zeros */
+    memset(&idt, 0, sizeof(struct idt_entry) * 256);
     
-    idtp.limit = (sizeof(struct idt_entry) * 256) - 1;
-    idtp.base = (uint32_t)&idt;
-    asm volatile("lidt %0" : : "m"(idtp));
+    isr_install();
+    irq_install();
+
+    __asm__ volatile("lidt %0" : : "m"(idtp));
+    io_outb(0x21, 0xfd);
+    io_outb(0xa1, 0xff);
 }
