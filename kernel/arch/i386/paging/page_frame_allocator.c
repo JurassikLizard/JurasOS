@@ -99,7 +99,7 @@ __attribute__((assume_aligned(4096)))
 void *pfa_request_pages(uint32_t page_count) {
     for (uint32_t index = 0; index < pfa.page_bitmap.size * 8; index++) {
         uint8_t broken_memory_flag = 0;
-        for (uint32_t offset = 0; offset < page_count && (offset + index) < pfa.page_bitmap.size; offset++){
+        for (uint32_t offset = 0; offset < page_count && (offset + index) < pfa.page_bitmap.size * 8; offset++){
             if (bitmap_get(&pfa.page_bitmap, index + offset) == true) { // Not contiguous freed memory
                 broken_memory_flag = 1;
                 index = index + offset; // To prevent looping through the same chunks that aren't available
@@ -136,7 +136,7 @@ __attribute__((assume_aligned(4096)))
 void *pfa_request_mpages(uint32_t page_count) {
     for (uint32_t index = 0; index < pfa.page_bitmap.size * 8; index++) {
         uint8_t broken_memory_flag = 0;
-        for (uint32_t offset = 0; offset < page_count && (offset + index) < pfa.page_bitmap.size; offset++){
+        for (uint32_t offset = 0; offset < page_count && (offset + index) < pfa.page_bitmap.size * 8; offset++){
             if (bitmap_get(&pfa.page_bitmap, index + offset) == true) { // Not contiguous freed memory
                 broken_memory_flag = 1;
                 index = index + offset; // To prevent looping through the same chunks that aren't available

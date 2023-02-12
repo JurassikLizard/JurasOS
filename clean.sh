@@ -8,7 +8,6 @@ for PROJECT in $PROJECTS; do
   (cd $PROJECT && $MAKE clean)
 done
 
-rm -rf sysroot
+rm -rf sysroot 
 rm -rf isodir
-rm -rf jurasos.iso
 rm -rf jurasos.iso

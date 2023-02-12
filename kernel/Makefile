@@ -37,6 +37,7 @@ LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
 KERNEL_OBJS=\
 kernel/kernel.o \
 kernel/bitmap.o \
+kernel/kheap.o \
 $(KERNEL_ARCH_OBJS)
 
 OBJS=\

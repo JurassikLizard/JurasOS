@@ -12,7 +12,10 @@
         "stdint.h": "c",
         "stdlib.h": "c",
         "cdefs.h": "c",
-        "irq.h": "c"
+        "irq.h": "c",
+        "kheap.h": "c",
+        "bitmap.h": "c",
+        "string.h": "c"
     },
     "C_Cpp.default.includePath": [
         "${default}",

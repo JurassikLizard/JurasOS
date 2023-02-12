@@ -9,6 +9,7 @@
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
 #include <kernel/timer.h>
+#include <kernel/kheap.h>
 #include <kernel/keyboard.h>
 #include <kernel/paging/pfa.h>
 #include <kernel/paging/paging.h>
@@ -33,7 +34,7 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic) {
     if(magic != MULTIBOOT_BOOTLOADER_MAGIC || !(mbt->flags >> 6 & 0x1)) {
         printf("Multiboot error!"); // TODO: PANIC
     }
-	
+
 	pfa_read_multiboot_memory_map(mbt);
 
 	init_timer(50);
@@ -41,7 +42,16 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic) {
 
 	asm volatile("sti");
   	idt_install();
+
+	uint32_t kheap_addr = KERNEL_END;
+	uint32_t kheap_size = 0x100000;
+	uint8_t kheap_granularity = 2;
+	kheap_add((void *)kheap_addr, kheap_size, kheap_granularity);
+	printf("Heap location: %p, total size: %d\n", kheap_addr, kheap_memory_size_of(kheap_size, kheap_granularity));
+
+	//KERNEL_END += kheap_memory_size_of(kheap_size, kheap_granularity);
 	
+	// Make sure to have KERNEL_END be it's final location (everything now should be dynamic memory allocation)
 	ptm_initialize();
 
 	printf("After init KERNEL_END: 0x%X\n", KERNEL_END);

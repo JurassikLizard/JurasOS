@@ -16,12 +16,12 @@ void ptm_initialize() {
     // Round up to nearest page boundary in order to keep everything 4kib aligned
     if (KERNEL_END % 4096)
         KERNEL_END = KERNEL_END + (4096 - KERNEL_END % 4096);
-
+    
     // Initialize page directory at the end of kernel
     uint32_t pd_pages = NUM_PAGES(sizeof(page_directory_t));
     pd = (page_directory_t *) KERNEL_END;
     KERNEL_END += pd_pages*4096;
-    memset(pd, 0, pd_pages*4096); // Unitialize everything
+    memset((uint8_t *)pd, 0, pd_pages*4096); // Unitialize everything
     pd->phys_addr = (uint32_t) pd;
     
     // Create all of the page tables at the end of the kernel
