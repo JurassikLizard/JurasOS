@@ -5,19 +5,19 @@
 
 #include <stdint.h>
 #include <kernel/bitmap.h>
-#include <kernel/multiboot.h>
+#include <kernel/multiboot2.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define NUM_PAGES(x) ((uint32_t)x / 4098 + 1)
+#define NUM_PAGES(x) ((uint32_t)(x) / 4098 + 1)
 
 typedef struct page_frame_allocator_struct {
     bitmap_t page_bitmap;
 } page_frame_allocator_t;
 
-void pfa_read_multiboot_memory_map(multiboot_info_t* mbt);
+void pfa_read_multiboot_memory_map(unsigned long addr);
 
 // Free 4096 chunk of memory at address
 void pfa_free_page(void *address);

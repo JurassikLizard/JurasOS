@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <kernel/multiboot.h>
+#include <kernel/multiboot2.h>
 #include <kernel/tty.h>
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
@@ -19,8 +19,14 @@ extern void *_kernel_end;
 
 uint32_t KERNEL_START;
 uint32_t KERNEL_END;
+ 
+struct multiboot_info {
+    uint32_t total_size;
+    uint32_t reserved;
+    struct multiboot_tag tags[0];
+};
 
-void kernel_main(multiboot_info_t* mbt, unsigned int magic) {
+void kernel_main(unsigned long magic, unsigned long mbi_addr) {
 	KERNEL_START = (uint32_t)&_kernel_start;
 	KERNEL_END = (uint32_t)&_kernel_end;
 	terminal_initialize(NULL);
@@ -28,24 +34,30 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic) {
 
 	printf("KERNEL_START: 0x%X, KERNEL_END: 0x%X\n", KERNEL_START, KERNEL_END);
 
-	gdt_install();
-	
-	/* Make sure the magic number matches and Check bit 6 to see if we have a valid memory map */
-    if(magic != MULTIBOOT_BOOTLOADER_MAGIC || !(mbt->flags >> 6 & 0x1)) {
-        printf("Multiboot error!"); // TODO: PANIC
+	/* Make sure the magic number matches (different than header magic) */
+    if(magic != 0x36d76289) {
+        PANIC("Multiboot magic not aligned: 0x%X", magic);
+    }
+	if (mbi_addr & 7)
+    {
+      PANIC("Unaligned MBI: 0x%X\n", mbi_addr);
     }
 
-	pfa_read_multiboot_memory_map(mbt);
+	gdt_install();
+
+	pfa_read_multiboot_memory_map(mbi_addr);
+
+	idt_install();
 
 	init_timer(50);
 	init_keyboard();
 
 	asm volatile("sti");
-  	idt_install();
+	
 
 	uint32_t kheap_addr = KERNEL_END;
-	uint32_t kheap_size = 0x100000;
-	uint8_t kheap_granularity = 2;
+	uint32_t kheap_size = 0x80000; // Half a megabyte
+	uint8_t kheap_granularity = 4; // uint32_t
 	kheap_add((void *)kheap_addr, kheap_size, kheap_granularity);
 	printf("Heap location: %p, total size: %d\n", kheap_addr, kheap_memory_size_of(kheap_size, kheap_granularity));
 

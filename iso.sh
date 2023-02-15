@@ -8,8 +8,11 @@ mkdir -p isodir/boot/grub
 
 cp sysroot/boot/jurasos.kernel isodir/boot/jurasos.kernel
 cat > isodir/boot/grub/grub.cfg << EOF
+set timeout=1
+
 menuentry "jurasos" {
-	multiboot /boot/jurasos.kernel
+	multiboot2 /boot/jurasos.kernel
+	boot
 }
 EOF
 grub-mkrescue -o jurasos.iso isodir

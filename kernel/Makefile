@@ -54,7 +54,7 @@ $(ARCHDIR)/crtbegin.o \
 $(KERNEL_OBJS) \
 $(LIBS) \
 $(ARCHDIR)/crtend.o \
-$(ARCHDIR)/crtn.o \
+$(ARCHDIR)/crtn.o
 
 .PHONY: all clean install install-headers install-kernel
 .SUFFIXES: .o .c .S
@@ -63,8 +63,8 @@ all: jurasos.kernel
 
 # -T makes it use a linker script
 jurasos.kernel:$(OBJS) $(ARCHDIR)/linker.ld
-	$(CC) -T $(ARCHDIR)/linker.ld -o $@ $(CFLAGS) $(LINK_TARGETS)
-	grub-file --is-x86-multiboot jurasos.kernel
+	$(CC) -z max-page-size=0x1000 -T $(ARCHDIR)/linker.ld -o $@ $(CFLAGS) $(LINK_TARGETS)
+	grub-file --is-x86-multiboot2 jurasos.kernel
 
 # init objects
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:

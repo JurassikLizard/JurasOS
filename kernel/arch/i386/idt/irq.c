@@ -99,7 +99,7 @@ void irq_handler(registers_t regs)
     {
         io_outb(0xA0, 0x20);
     }
-
+    
     /* In either case, we need to send an EOI to the master
     *  interrupt controller too */
     io_outb(0x20, 0x20);

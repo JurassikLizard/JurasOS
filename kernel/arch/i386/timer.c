@@ -3,7 +3,9 @@
 #include "idt/irq.h"
 
 #include <kernel/io.h>
+
 #include <stdlib.h>
+#include <stdio.h>
 
 uint32_t tick;
 
