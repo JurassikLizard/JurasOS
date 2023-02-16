@@ -2,9 +2,11 @@
 #include <kernel/paging/pfa.h>
 #include <kernel/paging/paging.h>
 #include <kernel/multiboot2.h>
+#include <kernel/tags.h>
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 uint32_t free_memory; // Entire system free
@@ -24,7 +26,7 @@ void pfa_unreserve_page(void *address);
 void pfa_reserve_pages(void *address, uint32_t page_count);
 void pfa_unreserve_pages(void *address, uint32_t page_count);
 
-void pfa_read_multiboot_memory_map(unsigned long addr) {
+void pfa_read_multiboot_memory_map(multiboot_tags_info_t *tags) {
     if (initialized) return;
 
     // Setup basic values
@@ -33,34 +35,20 @@ void pfa_read_multiboot_memory_map(unsigned long addr) {
 
     uint32_t memory_size = 0;
     
-    struct multiboot_tag *tag;
-    struct multiboot_tag *mmap_tag = 0;
+    struct multiboot_tag_mmap *tag = tags->memory_map;
 
     // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html#kernel_002ec
-    for (tag = (struct multiboot_tag *) (addr + 8);
-       tag->type != MULTIBOOT_TAG_TYPE_END;
-       tag = (struct multiboot_tag *) ((multiboot_uint8_t *) tag 
-                                       + ((tag->size + 7) & ~7)))
+    for (mmap = tag->entries; (uint8_t *) mmap < (uint8_t *) tag + tag->size;
+            mmap = (multiboot_memory_map_t *)  ((unsigned long) mmap + tag->entry_size))
     {
-        if (tag->type == MULTIBOOT_TAG_TYPE_MMAP) {
-            mmap_tag = tag;
-            for (mmap = ((struct multiboot_tag_mmap *) tag)->entries;
-                 (multiboot_uint8_t *) mmap 
-                   < (multiboot_uint8_t *) tag + tag->size;
-                 mmap = (multiboot_memory_map_t *) 
-                   ((unsigned long) mmap
-                    + ((struct multiboot_tag_mmap *) tag)->entry_size))
-            {
-                memory_size += (mmap->len & 0xffffffff);
-                if(mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
-                    free_memory += (mmap->len & 0xffffffff);
-                }
-            }
-            // Might be source of bugs because I didn't understand this right.
+        memory_size += (mmap->len & 0xffffffff);
+        if(mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
+            free_memory += (mmap->len & 0xffffffff);
         }
     }
+    // Might be source of bugs because I didn't understand this right.
 
-    if (mmap_tag == 0) {
+    if (tag->type != MULTIBOOT_TAG_TYPE_MMAP) {
         PANIC("MMAP NOT FOUND!");
     }
 
@@ -89,12 +77,8 @@ void pfa_read_multiboot_memory_map(unsigned long addr) {
     // Increment kernel end for the ptm_init function to map the bitmap
     KERNEL_END += bitmap_size;
 
-    for (mmap = ((struct multiboot_tag_mmap *) mmap_tag)->entries;
-                 (multiboot_uint8_t *) mmap 
-                   < (multiboot_uint8_t *) mmap_tag + mmap_tag->size;
-                 mmap = (multiboot_memory_map_t *) 
-                   ((unsigned long) mmap
-                    + ((struct multiboot_tag_mmap *) mmap_tag)->entry_size))
+    for (mmap = tag->entries; (uint8_t *) mmap < (uint8_t *) tag +tag->size;
+                 mmap = (multiboot_memory_map_t *) ((unsigned long) mmap + tag->entry_size))
     {
         if (mmap->type != MULTIBOOT_MEMORY_AVAILABLE) {
             pfa_reserve_pages((void *)mmap, NUM_PAGES((mmap->len & 0xffffffff)));

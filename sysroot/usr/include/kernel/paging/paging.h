@@ -2,17 +2,18 @@
 #define _PAGING_H 1
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct page_table_struct
+typedef struct
 {
    uint32_t entries[1024];
 } page_table_t;
 
-typedef struct page_directory_struct
+typedef struct
 {
    /**
       Array of page directory entries with top 20 bits being pointers to page tables

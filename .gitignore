@@ -5,5 +5,10 @@
 
 **/*.gas
 **/*.intel
+**/*.hex
+
+*.gas
+*.intel
+*.hex
 
 qemu.sh

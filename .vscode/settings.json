@@ -16,7 +16,9 @@
         "kheap.h": "c",
         "bitmap.h": "c",
         "string.h": "c",
-        "multiboot2.h": "c"
+        "multiboot2.h": "c",
+        "acpi.h": "c",
+        "stdbool.h": "c"
     },
     "C_Cpp.default.includePath": [
         "${default}",

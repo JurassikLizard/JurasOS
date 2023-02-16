@@ -9,11 +9,10 @@
 extern "C" {
 #endif
 
-struct bitmap_struct {
+typedef struct {
     size_t size;
     uint8_t *buffer;
-};
-typedef struct bitmap_struct bitmap_t;
+} bitmap_t;
 
 bool bitmap_get(bitmap_t * bitmap, uint32_t index);
 void bitmap_set(bitmap_t * bitmap, uint32_t index, bool value);

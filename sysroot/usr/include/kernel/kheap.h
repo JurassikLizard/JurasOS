@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-typedef struct kheap_chunk_struct {
+typedef struct {
     uint32_t size;
 	uint32_t used; // amount of memory used (should be aligned to granularity)
 	uint16_t granularity;
@@ -25,7 +25,7 @@ typedef struct kheap_chunk_struct {
     uint8_t *start;
 } kheap_chunk_t;
 
-typedef struct kheap_struct {
+typedef struct {
     bitmap_t bitmap;
     kheap_chunk_t chunk;
 } kheap_t;

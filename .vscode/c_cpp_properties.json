@@ -3,8 +3,9 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
+                "${workspaceFolder}/*",
                 "${workspaceFolder}/sysroot/usr/include",
+                "${workspaceFolder}/sysroot/usr/include/kernel",
                 "/sysroot/usr/include",
                 "${workspaceRoot}"
             ],
