@@ -7,11 +7,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-uint32_t tick;
+volatile uint32_t timer_tick;
+uint32_t timer_frequency;
 
 static void timer_callback(registers_t regs)
 {
-    tick++;
+    timer_tick++;
 }
 
 void init_timer(uint32_t frequency)
@@ -23,6 +24,7 @@ void init_timer(uint32_t frequency)
    // (1193180 Hz) by, to get our required frequency. Important to note is
    // that the divisor must be small enough to fit into 16-bits.
    uint32_t divisor = 1193180 / frequency;
+   timer_frequency = frequency;
 
    // Send the command byte.
    io_outb(0x43, 0x36);

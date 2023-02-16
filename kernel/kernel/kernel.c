@@ -12,7 +12,7 @@
 #include <kernel/timer.h>
 #include <kernel/kheap.h>
 #include <kernel/keyboard.h>
-#include <kernel/acpi/acpi.h>
+#include <kernel/acpi.h>
 #include <kernel/paging/pfa.h>
 #include <kernel/paging/paging.h>
 

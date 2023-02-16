@@ -14,6 +14,8 @@ void abort(void);
 __attribute__((__noreturn__))
 void PANIC(const char *message, ...);
 
+void delay(unsigned int millis);
+
 #ifdef __cplusplus
 }
 #endif

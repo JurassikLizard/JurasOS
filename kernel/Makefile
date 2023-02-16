@@ -39,6 +39,7 @@ kernel/kernel.o \
 kernel/bitmap.o \
 kernel/kheap.o \
 kernel/tags.o \
+kernel/ahci/ahci.o \
 $(KERNEL_ARCH_OBJS)
 
 OBJS=\
