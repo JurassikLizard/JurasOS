@@ -13,10 +13,17 @@ typedef volatile struct
 {
 #define HBA_PORT_DEV_PRESET 0x3
 #define HBA_PORT_IPM_ACTIVE 0x1
+
+#define HBA_PxCMD_CR 		0x8000
+#define HBA_PxCMD_FRE		0x0010
+#define HBA_PxCMD_ST		0x0x0001
+#define HBA_PxCMD_FRE		0x4000
+
 #define SATA_SIG_ATAPI      0xeb140101
 #define SATA_SIG_ATA        0x00000101
 #define SATA_SIG_SEMB       0xc33c0101
 #define SATA_SIG_PM         0x96690101
+
 	uint32_t clb;		// 0x00, command list base address, 1K-byte aligned
 	uint32_t clbu;		// 0x04, command list base address upper 32 bits
 	uint32_t fb;		// 0x08, FIS base address, 256-byte aligned
@@ -64,6 +71,34 @@ typedef volatile struct
 	HBA_PORT	ports[1];	// 1 ~ 32
 } HBA_MEM;
 
+typedef volatile struct
+{
+	// DW0
+	uint8_t  cfl:5;		// Command FIS length in DWORDS, 2 ~ 16
+	uint8_t  a:1;		// ATAPI
+	uint8_t  w:1;		// Write, 1: H2D, 0: D2H
+	uint8_t  p:1;		// Prefetchable
+ 
+	uint8_t  r:1;		// Reset
+	uint8_t  b:1;		// BIST
+	uint8_t  c:1;		// Clear busy upon R_OK
+	uint8_t  rsv0:1;		// Reserved
+	uint8_t  pmp:4;		// Port multiplier port
+ 
+	uint16_t prdtl;		// Physical region descriptor table length in entries
+ 
+	// DW1
+	volatile
+	uint32_t prdbc;		// Physical region descriptor byte count transferred
+ 
+	// DW2, 3
+	uint32_t ctba;		// Command table descriptor base address
+	uint32_t ctbau;		// Command table descriptor base address upper 32 bits
+ 
+	// DW4 - 7
+	uint32_t rsv1[4];	// Reserved
+} HBA_CMD_HEADER;
+
 typedef enum {
     None = 0,
     SATA = 1,
@@ -72,11 +107,21 @@ typedef enum {
     SATAPI = 4,
 } PORT_TYPE;
 
+typedef struct {
+    HBA_PORT            *hba_port;
+	PORT_TYPE			port_type;
+	uint8_t				*buffer;
+	uint8_t				port_num;
+} ahci_port_t;
 
 typedef struct {
     pci_device_header_t *pci_base_addr;
     HBA_MEM             *ABAR;
+	ahci_port_t			*ports[32];
+	uint8_t				port_count;
 } ahci_driver_t;
+
+void ahci_configure_port(ahci_port_t *port);
 
 void ahci_driver_init(pci_device_header_t *pci_base_addr);
 void ahci_driver_deinit(pci_device_header_t *pci_base_addr);
